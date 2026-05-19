@@ -300,6 +300,59 @@ def extract_text_with_timestamps(json_obj):
     return "\n".join(result)
 
 
+def read_tsrp_from_udta(f, trak_end):
+    """Try the .m4a path: trak → udta → tsrp. Returns raw bytes or None."""
+    udta_end, _ = find_atom(f, trak_end, "udta")
+    if not udta_end:
+        return None
+    tsrp_end, _ = find_atom(f, udta_end, "tsrp")
+    if not tsrp_end:
+        return None
+    return f.read(tsrp_end - f.tell())
+
+
+def read_tsrp_from_meta_ilst(f, trak_end):
+    """Try the .qta path: trak → meta → ilst (keyed as com.apple.VoiceMemos.tsrp). Returns raw bytes or None."""
+    meta_end, _ = find_atom(f, trak_end, "meta")
+    if not meta_end:
+        return None
+
+    # Verify the keys atom names com.apple.VoiceMemos.tsrp as key 1
+    keys_end, _ = find_atom(f, meta_end, "keys")
+    if not keys_end:
+        return None
+    f.read(4)  # version + flags
+    key_count = struct.unpack(">I", f.read(4))[0]
+    tsrp_key_index = None
+    for i in range(1, key_count + 1):
+        key_size = struct.unpack(">I", f.read(4))[0]
+        f.read(4)  # namespace
+        key_value = f.read(key_size - 8).decode("utf-8", errors="replace")
+        if key_value == "com.apple.VoiceMemos.tsrp":
+            tsrp_key_index = i
+    if tsrp_key_index is None:
+        return None
+
+    ilst_end, _ = find_atom(f, meta_end, "ilst")
+    if not ilst_end:
+        return None
+
+    # Walk ilst items looking for the tsrp key index
+    while f.tell() < ilst_end:
+        item_start = f.tell()
+        item_size = struct.unpack(">I", f.read(4))[0]
+        key_index = struct.unpack(">I", f.read(4))[0]
+        item_end = item_start + item_size
+        if key_index == tsrp_key_index:
+            data_size = struct.unpack(">I", f.read(4))[0]
+            if f.read(4) != b"data":
+                return None
+            f.read(8)  # type indicator + locale
+            return f.read(data_size - 16)
+        f.seek(item_end)
+    return None
+
+
 def process_m4a_file(filename):
     with open(filename, "rb") as f:
         file_size = f.seek(0, 2)
@@ -313,17 +366,14 @@ def process_m4a_file(filename):
         if not trak_end:
             error_exit("error: 'trak' atom not found")
 
-        udta_end, _ = find_atom(f, trak_end, "udta")
-        if not udta_end:
-            error_exit("error: 'udta' atom not found")
-
-        tsrp_end, header_size = find_atom(f, udta_end, "tsrp")
-        if not tsrp_end:
+        # Try .m4a path first (trak → udta → tsrp), then .qta path (trak → meta → ilst)
+        trak_search_start = f.tell()
+        tsrp_data = read_tsrp_from_udta(f, trak_end)
+        if tsrp_data is None:
+            f.seek(trak_search_start)
+            tsrp_data = read_tsrp_from_meta_ilst(f, trak_end)
+        if tsrp_data is None:
             error_exit("error: 'tsrp' atom not found")
-
-        current_pos = f.tell()
-        data_size = tsrp_end - current_pos
-        tsrp_data = f.read(data_size)
 
         try:
             json_obj = json.loads(tsrp_data.decode("utf-8"))

@@ -19,7 +19,7 @@ Voice Memos must be synced with iCloud on macOS.
 This skill includes two scripts in its `scripts/` directory:
 
 - **`extract-apple-voice-memos-metadata`** — Queries the CloudRecordings.db SQLite database (read-only) and outputs CSV with columns: `title`, `date`, `duration`, `path`. Supports optional flags: `--limit N` (default 10), `--offset N`, `--search TERM`, `--after YYYY-MM-DD`, `--before YYYY-MM-DD`.
-- **`extract-apple-voice-memos-transcript`** — Extracts the embedded transcript from a `.m4a` file's `tsrp` atom. Outputs timestamped text with filler words removed, intelligent line breaks, and paragraph breaks at natural pauses.
+- **`extract-apple-voice-memos-transcript`** — Extracts the embedded transcript from a Voice Memos recording (`.m4a` or `.qta`). Outputs timestamped text with filler words removed, intelligent line breaks, and paragraph breaks at natural pauses.
 
 ## Step 1: Select a voice memo
 
@@ -46,7 +46,7 @@ Present the results as a numbered list showing title, date, and duration. Ask th
 Run the transcript script with the `path` value from the selected recording:
 
 ```bash
-python3 scripts/extract-apple-voice-memos-transcript "<FILENAME>.m4a"
+python3 scripts/extract-apple-voice-memos-transcript "<FILENAME>"
 ```
 
 Present the timestamped transcript to the user.
