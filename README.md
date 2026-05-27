@@ -7,7 +7,7 @@ Extract and process transcripts from Apple Voice Memos synced via iCloud.
 You can install this skill into Claude Code, Gemini, Cursor, and other agents that support the [Agent Skills](https://agentskills.io/home) format:
 
 ```bash
-npx skills add https://github.com/jessedc/claude-apple-voice-memos-skill --skill apple-voice-memos
+npx skills add https://github.com/jessedc/apple-voice-memos --skill apple-voice-memos
 ```
 
 If you get the error `npx: command not found`, you need to install Node first:
