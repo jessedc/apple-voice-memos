@@ -36,7 +36,7 @@ Flags can be combined, e.g. `--search work --after 2026-01-01 --limit 5`.
 python3 scripts/extract-apple-voice-memos-metadata [flags]
 ```
 
-Present the results as a numbered list showing title, date, and duration. Ask the user which memo they'd like to work with.
+If the user's request unambiguously identifies a single memo (e.g., "my latest voice memo", or a search that returns exactly one match), proceed directly with that memo without asking. Otherwise, present the results as a numbered list showing title, date, and duration, and ask the user which memo they'd like to work with.
 
 **Error handling:**
 - "Database not found" → Voice Memos iCloud sync is not enabled on this Mac.
