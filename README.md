@@ -57,7 +57,11 @@ Transcripts are extracted from the `.m4a` files present on your machine, no audi
 
 > I rambled into my phone about a project idea recently, help me make sense of it.
 
-> Summarize my latest voice memo and save it as a markdown file.
+> Summarize my latest voice memo and save it as a markdown file, without asking me anything.
+
+> Find my voice memo about the kitchen renovation and turn it into notes with action items.
+
+> Show me the raw timestamped transcript of my latest memo — don't summarize it, I want the exact wording.
 
 ## Further Reading
 
