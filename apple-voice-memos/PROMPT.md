@@ -14,27 +14,31 @@ You are processing a raw voice memo transcript into organised, comprehensive not
 
 ### Output Format
 
-Produce the following sections in order:
+Begin the document with a top-level heading containing the memo title provided below (`# <Memo Title>`), then produce the following sections in order:
 
-#### Narrative Summary
+## Narrative Summary
 
 A prose reconstruction of the key themes and how the speaker's thinking developed across the recording. If there is a temporal arc — starting with one position and refining or reversing it — preserve that arc. Write this as a coherent, readable narrative, not a list. Keep it concise but complete. This section should give a reader who skips the detail a clear picture of what was covered and what conclusions, if any, were reached.
 
-#### Detailed Notes
+## Detailed Notes
 
 Organised by topic. Each topic gets a heading, a one-sentence summary, and then dot points covering every substantive idea within that topic. Use nested sub-bullets for supporting details, examples, caveats, or qualifications. Where the speaker revised or contradicted an earlier statement, include both the original and revised positions with context. Where timestamps are available, note the timestamp range or key timestamps for each topic.
 
-#### Asides & Fragments
+## Asides & Fragments
 
 Ideas that don't fit neatly into the main topic groupings but are worth preserving. These are often the most original or unexpected thoughts — "oh, one more thing" moments, tangential observations, or seeds of ideas that weren't developed further. Don't discard these by folding them into a topic where they don't belong; give them their own space.
 
-#### Takeaways & Actions
+## Takeaways & Actions
 
 - **Decisions reached** — Conclusions the speaker arrived at, stated with the level of confidence the speaker expressed (firm decision vs. leaning toward vs. still weighing).
 - **Open questions** — Things the speaker explicitly flagged as unresolved or needing more thought/research.
 - **Action items** — Concrete next steps mentioned, including any deadlines or dependencies if stated.
 
 ---
+
+## Memo Title
+
+*(Paste the memo title below this line.)*
 
 ## Transcript
 

@@ -45,9 +45,9 @@ Present the results as a numbered list showing title, date, and duration. Ask th
 
 Spawn a subagent with fresh context to extract and process the transcript. Do not run the transcript script yourself first — letting the subagent extract it keeps the full transcript out of the main conversation context. The subagent prompt must contain:
 
-1. The `path` value of the selected recording (from the metadata output)
+1. The `title` and `path` values of the selected recording (from the metadata output)
 2. The absolute paths to this skill's `scripts/extract-apple-voice-memos-transcript` script and `PROMPT.md`
-3. These instructions: run the transcript script with the recording path, read `PROMPT.md`, append the transcript after the `## Transcript` heading, then follow the complete prompt and return the resulting markdown document.
+3. These instructions: run the transcript script with the recording path, read `PROMPT.md`, append the memo title after the `## Memo Title` heading and the transcript after the `## Transcript` heading, then follow the complete prompt and return the resulting markdown document.
 
 Only run the transcript script directly if the user explicitly asks to see the raw timestamped transcript:
 
@@ -61,6 +61,14 @@ python3 scripts/extract-apple-voice-memos-transcript "<FILENAME>.m4a"
 
 ## Step 3: Present the output
 
-The subagent will produce a structured markdown document with narrative summary, detailed notes, asides, and action items. Add all metadata fields from the original file to the agent output underneath the first title heading then present the output to the user.
+The subagent will produce a markdown document starting with a `# <Memo Title>` heading, followed by narrative summary, detailed notes, asides, and action items. Insert a metadata block directly beneath the title heading, then present the output to the user:
+
+```markdown
+# <Memo Title>
+
+- **Date:** <date from the metadata output>
+- **Duration:** <duration from the metadata output>
+- **Source:** <FILENAME>.m4a
+```
 
 After presenting the output, ask the user if they'd like to save it as a markdown file. Suggest a filename in the format `YYYY-MM-DD-slugified-title.md` derived from the memo's title and date (e.g., `2026-02-04-the-soul-of-a-new-machine.md`). Save to the current working directory by default. The user may accept, provide a different name or path, request adjustments to the content first, or skip saving.
