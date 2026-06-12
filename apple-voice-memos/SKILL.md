@@ -16,7 +16,7 @@ Voice Memos must be synced with iCloud on macOS.
 
 ## Tools
 
-This skill includes two scripts in its `scripts/` directory:
+This skill includes two scripts in its `scripts/` directory. Script paths in this document are relative to this skill's directory — your working directory is likely elsewhere, so invoke them with absolute paths (e.g. `python3 <skill-dir>/scripts/extract-apple-voice-memos-metadata`).
 
 - **`extract-apple-voice-memos-metadata`** — Queries the CloudRecordings.db SQLite database (read-only) and outputs CSV with columns: `title`, `date`, `duration`, `path`, `has_transcript`. Supports optional flags: `--limit N` (default 10), `--offset N`, `--search TERM`, `--after YYYY-MM-DD`, `--before YYYY-MM-DD`.
 - **`extract-apple-voice-memos-transcript`** — Extracts the embedded transcript from a `.m4a` file's `tsrp` atom. Outputs timestamped text with filler words removed, intelligent line breaks, and paragraph breaks at natural pauses.
@@ -48,6 +48,8 @@ Spawn a subagent with fresh context to extract and process the transcript. Do no
 1. The `title` and `path` values of the selected recording (from the metadata output)
 2. The absolute paths to this skill's `scripts/extract-apple-voice-memos-transcript` script and `PROMPT.md`
 3. These instructions: run the transcript script with the recording path, read `PROMPT.md`, append the memo title after the `## Memo Title` heading and the transcript after the `## Transcript` heading, then follow the complete prompt and return the resulting markdown document.
+
+If your environment has no subagent or task tool, do the same work yourself: run the transcript script, read `PROMPT.md`, and follow its instructions directly with the extracted transcript.
 
 Only run the transcript script directly if the user explicitly asks to see the raw timestamped transcript:
 
