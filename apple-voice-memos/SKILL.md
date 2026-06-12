@@ -41,23 +41,25 @@ Present the results as a numbered list showing title, date, and duration. Ask th
 **Error handling:**
 - "Database not found" → Voice Memos iCloud sync is not enabled on this Mac.
 
-## Step 2: Extract the transcript
+## Step 2: Extract and process the transcript
 
-Run the transcript script with the `path` value from the selected recording:
+Spawn a subagent with fresh context to extract and process the transcript. Do not run the transcript script yourself first — letting the subagent extract it keeps the full transcript out of the main conversation context. The subagent prompt must contain:
+
+1. The `path` value of the selected recording (from the metadata output)
+2. The absolute paths to this skill's `scripts/extract-apple-voice-memos-transcript` script and `PROMPT.md`
+3. These instructions: run the transcript script with the recording path, read `PROMPT.md`, append the transcript after the `## Transcript` heading, then follow the complete prompt and return the resulting markdown document.
+
+Only run the transcript script directly if the user explicitly asks to see the raw timestamped transcript:
 
 ```bash
 python3 scripts/extract-apple-voice-memos-transcript "<FILENAME>.m4a"
 ```
 
-Present the timestamped transcript to the user.
-
-**Error handling:**
+**Error handling (reported by the subagent):**
 - "tsrp atom not found" → This recording does not have an embedded transcript. Apple generates transcripts on-device and not all recordings will have one.
 - File not found → The recording file may not have synced to this Mac yet.
 
-## Step 3: Process the transcript
-
-Read `PROMPT.md` from this skill's directory. Append the transcript after the `## Transcript` heading. Send the complete prompt and transcript to a subagent with fresh context for processing.
+## Step 3: Present the output
 
 The subagent will produce a structured markdown document with narrative summary, detailed notes, asides, and action items. Add all metadata fields from the original file to the agent output underneath the first title heading then present the output to the user.
 
