@@ -32,9 +32,9 @@ The skill is called Apple Voice Memos, and can be triggered in Claude Code:
 
 The skill walks you through three steps:
 
-1. **Select** — Finds voice memos by recency, title search, or date range
-2. **Extract** — Pulls the embedded transcript from the selected memo
-3. **Process** — Sends the transcript to a subagent that produces structured notes with narrative summary, detailed notes, asides, and action items
+1. **Select** — Finds voice memos by recency, title search, or date range, flagging any without a transcript (skips the question when your request identifies a single memo)
+2. **Extract & process** — A subagent pulls the embedded transcript from the selected memo and produces structured notes with narrative summary, detailed notes, asides, and action items — keeping the full transcript out of the main conversation
+3. **Present** — Adds the memo's date, duration, and source file beneath the title and offers to save the notes as a markdown file
 
 You can also trigger the skill using natural language:
 
@@ -44,7 +44,7 @@ You can also trigger the skill using natural language:
 
 Two Python scripts (standard library only, no dependencies):
 
-- **`extract-apple-voice-memos-metadata`** — Queries the `CloudRecordings.db` SQLite database (read-only) for recording titles, dates, durations, and filenames. Supports filtering and pagination.
+- **`extract-apple-voice-memos-metadata`** — Queries the `CloudRecordings.db` SQLite database (read-only) for recording titles, dates, durations, and filenames, and reports whether each recording has an embedded transcript. Supports filtering and pagination.
 - **`extract-apple-voice-memos-transcript`** — Extracts transcript text from the `tsrp` atom embedded in `.m4a` files by Apple's on-device transcription. Adds timestamps, removes filler words, and inserts paragraph breaks at natural pauses.
 
 Transcripts are extracted from the `.m4a` files present on your machine, no audio is processed.
