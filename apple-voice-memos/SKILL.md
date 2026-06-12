@@ -18,7 +18,7 @@ Voice Memos must be synced with iCloud on macOS.
 
 This skill includes two scripts in its `scripts/` directory:
 
-- **`extract-apple-voice-memos-metadata`** — Queries the CloudRecordings.db SQLite database (read-only) and outputs CSV with columns: `title`, `date`, `duration`, `path`. Supports optional flags: `--limit N` (default 10), `--offset N`, `--search TERM`, `--after YYYY-MM-DD`, `--before YYYY-MM-DD`.
+- **`extract-apple-voice-memos-metadata`** — Queries the CloudRecordings.db SQLite database (read-only) and outputs CSV with columns: `title`, `date`, `duration`, `path`, `has_transcript`. Supports optional flags: `--limit N` (default 10), `--offset N`, `--search TERM`, `--after YYYY-MM-DD`, `--before YYYY-MM-DD`.
 - **`extract-apple-voice-memos-transcript`** — Extracts the embedded transcript from a `.m4a` file's `tsrp` atom. Outputs timestamped text with filler words removed, intelligent line breaks, and paragraph breaks at natural pauses.
 
 ## Step 1: Select a voice memo
@@ -36,7 +36,7 @@ Flags can be combined, e.g. `--search work --after 2026-01-01 --limit 5`.
 python3 scripts/extract-apple-voice-memos-metadata [flags]
 ```
 
-If the user's request unambiguously identifies a single memo (e.g., "my latest voice memo", or a search that returns exactly one match), proceed directly with that memo without asking. Otherwise, present the results as a numbered list showing title, date, and duration, and ask the user which memo they'd like to work with.
+If the user's request unambiguously identifies a single memo (e.g., "my latest voice memo", or a search that returns exactly one match), proceed directly with that memo without asking. Otherwise, present the results as a numbered list showing title, date, and duration — mark any memo with `has_transcript` = `no` as "(no transcript)" — and ask the user which memo they'd like to work with.
 
 **Error handling:**
 - "Database not found" → Voice Memos iCloud sync is not enabled on this Mac.

@@ -6,6 +6,7 @@ import argparse
 import csv
 import os
 import sqlite3
+import struct
 import sys
 from datetime import datetime, timezone, timedelta
 
@@ -33,6 +34,58 @@ def format_duration(seconds):
     if h > 0:
         return f"{h}:{m:02d}:{s:02d}"
     return f"{m}:{s:02d}"
+
+
+def read_atom_header(f):
+    header = f.read(8)
+    if len(header) < 8:
+        return None, None
+
+    size = struct.unpack(">I", header[:4])[0]
+    atom_type = header[4:8].decode("ascii", errors="ignore")
+
+    if size == 1:
+        extended_size = struct.unpack(">Q", f.read(8))[0]
+        return atom_type, extended_size
+
+    return atom_type, size
+
+
+def find_atom(f, end_pos, target_type):
+    while f.tell() < end_pos:
+        current_pos = f.tell()
+        atom_type, atom_size = read_atom_header(f)
+
+        if atom_type is None or atom_size == 0:
+            return None
+
+        atom_end = current_pos + atom_size
+
+        if atom_type == target_type:
+            return atom_end
+
+        f.seek(atom_end)
+
+    return None
+
+
+def has_transcript(m4a_path):
+    """Check whether the .m4a embeds a tsrp transcript atom.
+
+    Walks moov > trak > udta > tsrp, mirroring the lookup the transcript
+    extraction script performs.
+    """
+    try:
+        with open(m4a_path, "rb") as f:
+            end_pos = f.seek(0, 2)
+            f.seek(0)
+            for atom_type in ("moov", "trak", "udta", "tsrp"):
+                end_pos = find_atom(f, end_pos, atom_type)
+                if end_pos is None:
+                    return "no"
+            return "yes"
+    except OSError:
+        return "no"
 
 
 def core_data_to_iso8601(timestamp):
@@ -92,10 +145,12 @@ def main():
     rows = conn.execute(query, params).fetchall()
     conn.close()
 
+    recordings_dir = os.path.dirname(db_path)
     writer = csv.writer(sys.stdout)
-    writer.writerow(["title", "date", "duration", "path"])
+    writer.writerow(["title", "date", "duration", "path", "has_transcript"])
     for title, date, duration, path in rows:
-        writer.writerow([title, core_data_to_iso8601(date), format_duration(duration), path])
+        transcript = has_transcript(os.path.join(recordings_dir, path)) if path else "no"
+        writer.writerow([title, core_data_to_iso8601(date), format_duration(duration), path, transcript])
 
 
 if __name__ == "__main__":
