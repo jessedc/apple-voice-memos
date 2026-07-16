@@ -1,4 +1,4 @@
-# Apple Voice Memos Claude Skill
+# Apple Voice Memos Agent Skill
 
 Extract and process transcripts from Apple Voice Memos synced via iCloud.
 
